@@ -1,6 +1,6 @@
 
 import os
-from src.wiktionaryparse import WiktionaryParser
+from wiktionaryparse import WiktionaryParser
 
 # get real path of script
 path = os.path.dirname(os.path.realpath(__file__))
@@ -46,7 +46,7 @@ def example():
     # ---------------------------
     # 4.5 - sed -i -e '/^$/d' word_list.json
     # ---------------------------
-    # 5 - cp word_list.json ./data/word_list
+    # 5 - cp word_list.json ../data/word_list
     # ---------------------------
 
 

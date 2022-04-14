@@ -1,0 +1,101 @@
+#!/bin/bash
+
+## VARS
+### Paths
+path=$(readlink -f "$0") && path=$(dirname "${path}")
+words_path="${path}/data/word_list" 
+### Random VARS
+line_number=$(shuf -i 1-"$(wc -l "${words_path}" | cut -d ' ' -f1)" -n 1)
+word=$( sed -n "${line_number}p" "$words_path" ) && word="${word,,}"
+### Attempts VARS
+attempts="0"
+max_attempts="10"
+### User VARS
+#### Create ${user_best}
+for (( i = 0; i < ${#word}; i++ )); do
+    letter="${word:$i:1}"
+    if [ ${i} -eq 0 ]; then
+        user_best+="${letter}"
+    else
+        user_best+="@"
+    fi
+done
+
+## Functions
+update_best(){
+    for (( i = 0; i <= ${#word}; i++ )); do
+        letter="${word:$i:1}"
+        user_letter="${user_word:$i:1}"
+        if [ "${user_letter,,}" = "${letter,,}" ] ; then
+            user_best=$(echo "$user_best" | sed "s/./${letter}/$(( i + 1))")
+        fi
+    done
+}
+
+pretty_printd(){
+    for (( i = 0; i < ${#word}; i++ )); do
+        #### Letters
+        letter="${word:$i:1}"
+        user_letter="${user_word:$i:1}"
+        user_better="${user_best:$i:1}"
+        #### Prints
+        if [ "${user_better,,}" = "${letter,,}" ] ; then
+            tput setab 2
+            printf "%s" "${letter^^}"
+        elif [[ *"${user_letter,,}"* == "${word}" ]] ; then
+            tput setab 3
+            printf "%s" "${letter^^}"
+        else
+            printf "*"
+        fi
+        #### Clean
+        tput sgr0
+    done
+    printf "\r"
+}
+
+# Pretty_printf() - Final Pretty print | Show if letter is correct / wrong placed or incorrect
+pretty_printf(){
+    printf "\r"
+    for (( i = 0; i < "${#word}"; i++ )); do
+        letter="${word:$i:1}"
+        user_letter="${user_word:$i:1}"
+        if [ "${i}" -eq "0" ] || [ "${user_letter,,}" = "${letter,,}" ] ; then
+            tput setab 2
+            printf "%s" "${letter^^}"
+        elif [[ "${word}"  == *"${user_letter,,}"* ]] ; then
+            tput setab 3
+            printf "%s" "${user_letter^^}"
+        else
+            tput setab 1
+            printf "%s" "${user_letter^^}"
+        fi
+        tput sgr0
+    done
+}
+## Script
+while : ; do
+    ### Updating ${user_best}
+    update_best
+    ### Check if WIN / FAILED
+    if [ "${user_best,,}" = "${word,,}" ] || [ "${attempts}" -gt "${max_attempts}" ]; then
+        break
+    fi
+    ### Attempts count and display
+    attempts=$(( attempts + 1 ))
+    printf "You have %d attempts left\n" "$(( 10 - attempts ))"
+    ### Pretty print of word
+    pretty_printd
+    # Read user entry
+    read -r user_word > /dev/null
+    # Re-Print
+    pretty_printf
+    # Finition
+    printf "\n\n"
+done
+printf "The word was %s, " "${word^^}"
+if [ "${user_best,,}" = "${word,,}" ] ; then
+    printf "congratulations !\n"
+else
+    printf "try again !\n"
+fi

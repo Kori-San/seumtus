@@ -1,0 +1,6 @@
+# Python
+/src/__pycache__
+
+# Dumps
+enwiktionary-latest-pages-articles.xml
+enwiktionary-latest-pages-articles.xml.bz2

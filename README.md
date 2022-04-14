@@ -1,2 +1,2 @@
-# seumtus
+# Seumtus
 Un MOTUS-like en bash sur des mots façile et d'autres qui foutent le seum...
